@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9248DDBA2E97D05C00814079 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9248DDB92E97D05C00814079 /* WidgetKit.framework */; };
+		9248DDBC2E97D05C00814079 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9248DDBB2E97D05C00814079 /* SwiftUI.framework */; };
+		9248DDCB2E97D05E00814079 /* AlbumWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9248DDB72E97D05C00814079 /* AlbumWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		9248DD962E97CEAC00814079 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +27,48 @@
 			remoteGlobalIDString = 9248DD852E97CEAB00814079;
 			remoteInfo = OpenAlbum;
 		};
+		9248DDC92E97D05E00814079 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9248DD7E2E97CEAB00814079 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9248DDB62E97D05C00814079;
+			remoteInfo = AlbumWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9248DDD02E97D05E00814079 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9248DDCB2E97D05E00814079 /* AlbumWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		9248DD862E97CEAB00814079 /* OpenAlbum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenAlbum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9248DD952E97CEAC00814079 /* OpenAlbumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenAlbumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9248DD9F2E97CEAC00814079 /* OpenAlbumUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenAlbumUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9248DDB72E97D05C00814079 /* AlbumWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AlbumWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9248DDB92E97D05C00814079 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9248DDBB2E97D05C00814079 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9248DDD12E97D06700814079 /* AlbumWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlbumWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9248DDCC2E97D05E00814079 /* Exceptions for "AlbumWidget" folder in "AlbumWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9248DDB62E97D05C00814079 /* AlbumWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9248DD882E97CEAB00814079 /* OpenAlbum */ = {
@@ -43,6 +84,14 @@
 		9248DDA22E97CEAC00814079 /* OpenAlbumUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = OpenAlbumUITests;
+			sourceTree = "<group>";
+		};
+		9248DDBD2E97D05C00814079 /* AlbumWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9248DDCC2E97D05E00814079 /* Exceptions for "AlbumWidget" folder in "AlbumWidgetExtension" target */,
+			);
+			path = AlbumWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,15 +118,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9248DDB42E97D05C00814079 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9248DDBC2E97D05C00814079 /* SwiftUI.framework in Frameworks */,
+				9248DDBA2E97D05C00814079 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		9248DD7D2E97CEAB00814079 = {
 			isa = PBXGroup;
 			children = (
+				9248DDD12E97D06700814079 /* AlbumWidgetExtension.entitlements */,
 				9248DD882E97CEAB00814079 /* OpenAlbum */,
 				9248DD982E97CEAC00814079 /* OpenAlbumTests */,
 				9248DDA22E97CEAC00814079 /* OpenAlbumUITests */,
+				9248DDBD2E97D05C00814079 /* AlbumWidget */,
+				9248DDB82E97D05C00814079 /* Frameworks */,
 				9248DD872E97CEAB00814079 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,8 +149,18 @@
 				9248DD862E97CEAB00814079 /* OpenAlbum.app */,
 				9248DD952E97CEAC00814079 /* OpenAlbumTests.xctest */,
 				9248DD9F2E97CEAC00814079 /* OpenAlbumUITests.xctest */,
+				9248DDB72E97D05C00814079 /* AlbumWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9248DDB82E97D05C00814079 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9248DDB92E97D05C00814079 /* WidgetKit.framework */,
+				9248DDBB2E97D05C00814079 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -102,10 +173,12 @@
 				9248DD822E97CEAB00814079 /* Sources */,
 				9248DD832E97CEAB00814079 /* Frameworks */,
 				9248DD842E97CEAB00814079 /* Resources */,
+				9248DDD02E97D05E00814079 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9248DDCA2E97D05E00814079 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9248DD882E97CEAB00814079 /* OpenAlbum */,
@@ -163,6 +236,28 @@
 			productReference = 9248DD9F2E97CEAC00814079 /* OpenAlbumUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		9248DDB62E97D05C00814079 /* AlbumWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9248DDCD2E97D05E00814079 /* Build configuration list for PBXNativeTarget "AlbumWidgetExtension" */;
+			buildPhases = (
+				9248DDB32E97D05C00814079 /* Sources */,
+				9248DDB42E97D05C00814079 /* Frameworks */,
+				9248DDB52E97D05C00814079 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9248DDBD2E97D05C00814079 /* AlbumWidget */,
+			);
+			name = AlbumWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = AlbumWidgetExtension;
+			productReference = 9248DDB72E97D05C00814079 /* AlbumWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +279,9 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 9248DD852E97CEAB00814079;
 					};
+					9248DDB62E97D05C00814079 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = 9248DD812E97CEAB00814079 /* Build configuration list for PBXProject "OpenAlbum" */;
@@ -203,6 +301,7 @@
 				9248DD852E97CEAB00814079 /* OpenAlbum */,
 				9248DD942E97CEAC00814079 /* OpenAlbumTests */,
 				9248DD9E2E97CEAC00814079 /* OpenAlbumUITests */,
+				9248DDB62E97D05C00814079 /* AlbumWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +322,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9248DD9D2E97CEAC00814079 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9248DDB52E97D05C00814079 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +359,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9248DDB32E97D05C00814079 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +378,11 @@
 			isa = PBXTargetDependency;
 			target = 9248DD852E97CEAB00814079 /* OpenAlbum */;
 			targetProxy = 9248DDA02E97CEAC00814079 /* PBXContainerItemProxy */;
+		};
+		9248DDCA2E97D05E00814079 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9248DDB62E97D05C00814079 /* AlbumWidgetExtension */;
+			targetProxy = 9248DDC92E97D05E00814079 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,16 +513,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpenAlbum/OpenAlbum.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R66925M2U8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -423,16 +544,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpenAlbum/OpenAlbum.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R66925M2U8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -518,6 +642,62 @@
 			};
 			name = Release;
 		};
+		9248DDCE2E97D05E00814079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = AlbumWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R66925M2U8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlbumWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AlbumWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ssssota.OpenAlbum.AlbumWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9248DDCF2E97D05E00814079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = AlbumWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R66925M2U8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlbumWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AlbumWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.ssssota.OpenAlbum.AlbumWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -553,6 +733,15 @@
 			buildConfigurations = (
 				9248DDB02E97CEAC00814079 /* Debug */,
 				9248DDB12E97CEAC00814079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9248DDCD2E97D05E00814079 /* Build configuration list for PBXNativeTarget "AlbumWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9248DDCE2E97D05E00814079 /* Debug */,
+				9248DDCF2E97D05E00814079 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
