@@ -68,11 +68,23 @@
 			);
 			target = 9248DDB62E97D05C00814079 /* AlbumWidgetExtension */;
 		};
+		928EED1D2E9A076B00EA2C55 /* Exceptions for "OpenAlbum" folder in "AlbumWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AmazonPhotos.swift,
+				Item.swift,
+				JustImage.swift,
+			);
+			target = 9248DDB62E97D05C00814079 /* AlbumWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9248DD882E97CEAB00814079 /* OpenAlbum */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				928EED1D2E9A076B00EA2C55 /* Exceptions for "OpenAlbum" folder in "AlbumWidgetExtension" target */,
+			);
 			path = OpenAlbum;
 			sourceTree = "<group>";
 		};

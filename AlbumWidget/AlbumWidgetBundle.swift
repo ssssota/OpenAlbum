@@ -5,13 +5,13 @@
 //  Created by Tomikawa Sotaro on 2025/10/09.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct AlbumWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        AlbumWidget()
-        AlbumWidgetControl()
-    }
+  var body: some Widget {
+    AlbumWidget()
+    // AlbumWidgetControl()
+  }
 }
