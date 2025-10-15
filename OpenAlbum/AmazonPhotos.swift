@@ -31,10 +31,10 @@ struct AmazonPhotos: AlbumProvider {
     return AmazonPhotos(id: shareId, tld: tld)
   }
 
-  func items() async throws -> [String] {
+  func items() async throws -> [ItemID] {
     guard let mediaParentId = try await resolveMediaParent() else { return [] }
 
-    var allIds: [String] = []
+    var allIds: [ItemID] = []
     let pageSize = 100
     var offset = 0
     var total = Int.max
@@ -51,7 +51,7 @@ struct AmazonPhotos: AlbumProvider {
         lowResThumbnail: true)
       total = response.count
       for item in response.data where item.kind == "FILE" {
-        allIds.append(item.id)
+        allIds.append(.string(item.id))
         if let tempLink = item.tempLink {
           AmazonPhotos.cacheQueue.async(flags: .barrier) {
             Self.imageUrlCache[item.id] = tempLink
@@ -64,12 +64,12 @@ struct AmazonPhotos: AlbumProvider {
     return allIds
   }
 
-  func image(id: String) async throws -> URL? {
+  func image(id: ItemID) async throws -> URL? {
+    guard case let .string(id) = id else { return nil }
     if let cached = AmazonPhotos.cacheQueue.sync(execute: { Self.imageUrlCache[id] }) {
       return URL(string: cached)
     }
     guard let mediaParentId = try await resolveMediaParent() else { return nil }
-    print("mediaParentId: \(mediaParentId)")
     let response = try await fetchChildren(
       nodeId: mediaParentId,
       limit: 100,

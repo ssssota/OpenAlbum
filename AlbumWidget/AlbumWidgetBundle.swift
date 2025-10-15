@@ -12,6 +12,5 @@ import WidgetKit
 struct AlbumWidgetBundle: WidgetBundle {
   var body: some Widget {
     AlbumWidget()
-    // AlbumWidgetControl()
   }
 }

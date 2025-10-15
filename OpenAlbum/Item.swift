@@ -9,14 +9,20 @@ import Foundation
 import SwiftData
 
 @Model
-final class Item {
+final class Item: Sendable {
   var url: URL
-  var id: String
+  var id: ItemID
 
-  init(url: URL, id: String) {
+  init(url: URL, id: ItemID) {
     self.url = url
     self.id = id
   }
+}
+
+enum ItemID: Codable, Hashable {
+  case int(Int)
+  case string(String)
+  case none
 }
 
 class AlbumManager {
@@ -65,8 +71,8 @@ class AlbumManager {
 
 protocol AlbumProvider {
   static func resolve(url: URL) -> AlbumProvider?
-  func items() async throws -> [String]
-  func image(id: String) async throws -> URL?
+  func items() async throws -> [ItemID]
+  func image(id: ItemID) async throws -> URL?
 }
 
 struct AlbumMeta {

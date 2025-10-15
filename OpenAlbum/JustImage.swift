@@ -18,11 +18,11 @@ struct JustImage: AlbumProvider {
     return nil
   }
 
-  func items() async throws -> [String] {
-    return [""]
+  func items() async throws -> [ItemID] {
+    return [.none]
   }
 
-  func image(id: String) async throws -> URL? {
+  func image(id: ItemID) async throws -> URL? {
     return url
   }
 }
