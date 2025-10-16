@@ -23,12 +23,23 @@ struct ContentView: View {
       List {
         ForEach(itemURLs, id: \.self) { url in
           NavigationLink {
-            Text(url.absoluteString)
+            AlbumView(url: url)
           } label: {
             Text(url.absoluteString)
           }
         }
-        .onDelete(perform: deleteItems)
+        .onDelete(perform: { indexSet in
+          withAnimation {
+            for index in indexSet {
+              let url = itemURLs[index]
+              let predicate = #Predicate<Item> { item in
+                item.url == url
+              }
+              try? modelContext.delete(model: Item.self, where: predicate)
+            }
+          }
+          syncModel()
+        })
       }
       .toolbar {
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -61,15 +72,6 @@ struct ContentView: View {
     }
   }
 
-  private func deleteItems(offsets: IndexSet) {
-    withAnimation {
-      for index in offsets {
-        modelContext.delete(items[index])
-      }
-    }
-    // syncModel()
-  }
-
   private func syncModel() {
     try? modelContext.save()
     // Widget の記録更新
@@ -98,6 +100,11 @@ struct SheetView: View {
           TextField("URL", text: $urlString)
             .autocapitalization(.none)
             .keyboardType(.URL)
+          Text(
+            "Enter the URL of the album you want to add. Currently, only URLs from Amazon Photos or just image URLs are supported."
+          )
+          .font(.caption)
+          .foregroundColor(.secondary)
         }
       }
       .navigationTitle("Add New Item")
@@ -122,11 +129,108 @@ struct SheetView: View {
   }
 }
 
+struct AlbumView: View {
+  @Environment(\.modelContext) private var modelContext
+  @Query private var items: [Item]
+  let url: URL
+
+  var albumItems: [Item] {
+    items.filter { $0.url == url }
+  }
+
+  var body: some View {
+    NavigationStack {
+      List {
+        ForEach(albumItems, id: \.self) { item in
+          NavigationLink {
+            ItemView(item: item)
+          } label: {
+            Text(item.id.toString())
+          }
+        }
+      }
+    }
+  }
+}
+
+struct ItemView: View {
+  let item: Item
+  @StateObject private var viewModel = ItemViewModel()
+
+  var body: some View {
+    VStack {
+      switch viewModel.loadState {
+      case .idle:
+        Color.clear
+          .task {
+            await viewModel.loadImage(item: item)
+          }
+      case .loading:
+        ProgressView()
+      case .loaded:
+        if let imageURL = viewModel.imageURL {
+          AsyncImage(url: imageURL)
+        } else {
+          Text("Loaded but no image URL")
+        }
+      case .failed(let error):
+        VStack(spacing: 8) {
+          Text("Failed to load image")
+            .font(.headline)
+          if let error {
+            Text(error.localizedDescription)
+              .font(.caption)
+              .foregroundColor(.secondary)
+              .multilineTextAlignment(.center)
+          }
+          Button("Retry") {
+            Task { await viewModel.retry(item: item) }
+          }
+          .buttonStyle(.borderedProminent)
+        }
+      }
+    }
+    .navigationTitle(item.id.toString())
+    .navigationBarTitleDisplayMode(.inline)
+  }
+}
+class ItemViewModel: ObservableObject {
+  @Published var imageURL: URL?
+  @Published var loadState: LoadState = .idle
+
+  struct NoImageError: LocalizedError {
+    var errorDescription: String? { "Image URL wasn’t returned." }
+  }
+
+  @MainActor
+  func loadImage(item: Item) async {
+    guard case .idle = loadState else { return }
+    loadState = .loading
+    do {
+      if let url = try await AlbumManager.shared.image(item: item) {
+        imageURL = url
+        loadState = .loaded
+      } else {
+        loadState = .failed(NoImageError())
+      }
+    } catch {
+      loadState = .failed(error)
+    }
+  }
+
+  @MainActor
+  func retry(item: Item) async {
+    imageURL = nil
+    loadState = .idle
+    await loadImage(item: item)
+  }
+}
+
 enum LoadState {
   case idle
   case loading
   case loaded
-  case failed
+  case failed(Error?)
 }
 
 #Preview {

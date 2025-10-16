@@ -23,6 +23,17 @@ enum ItemID: Codable, Hashable {
   case int(Int)
   case string(String)
   case none
+
+  func toString() -> String {
+    switch self {
+    case .int(let value):
+      return String(value)
+    case .string(let value):
+      return value
+    case .none:
+      return "none"
+    }
+  }
 }
 
 class AlbumManager {
