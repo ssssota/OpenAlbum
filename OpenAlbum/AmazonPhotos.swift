@@ -19,6 +19,9 @@ struct AmazonPhotos: AlbumProvider {
   private static let cacheQueue = DispatchQueue(
     label: "AmazonPhotosCacheQueue", attributes: .concurrent)
 
+  private static let filters =
+    "kind:FILE* AND contentProperties.contentType:\"image/jpeg\" AND status:(AVAILABLE*) AND settings.hidden:false"
+
   static func resolve(url: URL) -> (any AlbumProvider)? {
     guard let host = url.host, host.starts(with: "www.amazon.") else { return nil }
     let pathComponents = url.pathComponents
@@ -44,17 +47,17 @@ struct AmazonPhotos: AlbumProvider {
         nodeId: mediaParentId,
         limit: pageSize,
         offset: offset,
-        filters:
-          "kind:FILE* AND contentProperties.contentType:(image*) AND status:(AVAILABLE*) AND settings.hidden:false",
+        filters: Self.filters,
         tempLink: true,
         searchOnFamily: true,
         lowResThumbnail: true)
       total = response.count
-      for item in response.data where item.kind == "FILE" {
-        allIds.append(.string(item.id))
+      for (index, item) in zip(response.data.indices, response.data) {
+        let idx = offset + index
+        allIds.append(.int(idx))
         if let tempLink = item.tempLink {
           AmazonPhotos.cacheQueue.async(flags: .barrier) {
-            Self.imageUrlCache[item.id] = tempLink
+            Self.imageUrlCache["\(id)[\(idx)]"] = tempLink
           }
         }
       }
@@ -65,19 +68,28 @@ struct AmazonPhotos: AlbumProvider {
   }
 
   func image(id: ItemID) async throws -> URL? {
-    guard case let .string(id) = id else { return nil }
-    if let cached = AmazonPhotos.cacheQueue.sync(execute: { Self.imageUrlCache[id] }) {
+    guard case .int(let idx) = id else { return nil }
+    if let cached = AmazonPhotos.cacheQueue.sync(execute: { Self.imageUrlCache["\(id)[\(idx)]"] }) {
       return URL(string: cached)
     }
     guard let mediaParentId = try await resolveMediaParent() else { return nil }
     let response = try await fetchChildren(
       nodeId: mediaParentId,
-      limit: 100,
-      filters: "id:\"\(id)\"",
+      limit: 1,
+      offset: idx,
+      filters: Self.filters,
       tempLink: true,
-      searchOnFamily: true)
+      searchOnFamily: true,
+      lowResThumbnail: true)
     guard let url = response.data.first?.tempLink else { return nil }
-    return URL(string: url)
+    guard var url = URL(string: url) else { return nil }
+    let areaMax = 988_574.0
+    let sizeMax = Int(sqrt(areaMax))
+    url.append(queryItems: [.init(name: "viewBox", value: "\(sizeMax),\(sizeMax)")])
+    AmazonPhotos.cacheQueue.async(flags: .barrier) {
+      Self.imageUrlCache["\(id)[\(idx)]"] = url.absoluteString
+    }
+    return url
   }
 
   private struct ShareMetadata: Decodable {

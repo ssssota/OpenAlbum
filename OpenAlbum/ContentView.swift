@@ -169,7 +169,27 @@ struct ItemView: View {
         ProgressView()
       case .loaded:
         if let imageURL = viewModel.imageURL {
-          AsyncImage(url: imageURL)
+          AsyncImage(url: imageURL) { phase in
+            switch phase {
+            case .empty:
+              ProgressView()
+            case .success(let image):
+              image
+                .resizable()
+                .scaledToFit()
+            case .failure:
+              VStack(spacing: 8) {
+                Text("Failed to load image")
+                  .font(.headline)
+                Button("Retry") {
+                  Task { await viewModel.retry(item: item) }
+                }
+                .buttonStyle(.borderedProminent)
+              }
+            @unknown default:
+              EmptyView()
+            }
+          }
         } else {
           Text("Loaded but no image URL")
         }
