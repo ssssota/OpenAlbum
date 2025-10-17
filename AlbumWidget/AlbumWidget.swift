@@ -19,7 +19,7 @@ struct Provider: AppIntentTimelineProvider {
   }
 
   func placeholder(in context: Context) -> SimpleEntry {
-    SimpleEntry.withConfiguration(configuration: ConfigurationAppIntent())
+    .init(date: Date(), image: nil)
   }
 
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry
@@ -28,29 +28,28 @@ struct Provider: AppIntentTimelineProvider {
     let sizeMax = Int(sqrt(areaMax))
     let modelContext = ModelContext(modelContainer)
     guard let items = try? modelContext.fetch(FetchDescriptor<Item>()) else {
-      return SimpleEntry.withConfiguration(configuration: configuration)
+      return .init(date: Date(), image: nil)
     }
     print("items: \(items)")
     guard let item = items.randomElement() else {
-      return SimpleEntry.withConfiguration(configuration: configuration)
+      return .init(date: Date(), image: nil)
     }
     print("item: \(item)")
     guard var imageUrl = try? await AlbumManager.shared.image(item: item) else {
-      return SimpleEntry.withConfiguration(configuration: configuration)
+      return .init(date: Date(), image: nil)
     }
     imageUrl.append(queryItems: [.init(name: "viewBox", value: "\(sizeMax),\(sizeMax)")])
     print("imageUrl with query: \(imageUrl)")
     guard let (data, _) = try? await URLSession.shared.data(from: imageUrl) else {
-      return SimpleEntry.withConfiguration(configuration: configuration)
+      return .init(date: Date(), image: nil)
     }
     print("imageData")
     guard let image = UIImage(data: data) else {
-      return SimpleEntry.withConfiguration(configuration: configuration)
+      return .init(date: Date(), image: nil)
     }
 
     return SimpleEntry(
       date: Date(),
-      configuration: configuration,
       image: image
     )
   }
@@ -70,16 +69,8 @@ struct Provider: AppIntentTimelineProvider {
 
 struct SimpleEntry: TimelineEntry {
   let date: Date
-  let configuration: ConfigurationAppIntent
 
   let image: UIImage?
-
-  static func withConfiguration(configuration: ConfigurationAppIntent) -> SimpleEntry {
-    SimpleEntry(
-      date: Date(),
-      configuration: configuration,
-      image: nil)
-  }
 }
 
 struct AlbumWidgetEntryView: View {
@@ -108,7 +99,7 @@ struct AlbumWidget: Widget {
 
   var body: some WidgetConfiguration {
     AppIntentConfiguration(
-      kind: kind, intent: ConfigurationAppIntent.self,
+      kind: kind,
       provider: Provider(modelContainer: modelContainer)
     ) {
       entry in
@@ -119,25 +110,11 @@ struct AlbumWidget: Widget {
   }
 }
 
-extension ConfigurationAppIntent {
-  fileprivate static var smiley: ConfigurationAppIntent {
-    let intent = ConfigurationAppIntent()
-    intent.favoriteEmoji = "😀"
-    return intent
-  }
-
-  fileprivate static var starEyes: ConfigurationAppIntent {
-    let intent = ConfigurationAppIntent()
-    intent.favoriteEmoji = "🤩"
-    return intent
-  }
-}
-
 #Preview(as: .systemSmall) {
   AlbumWidget()
 } timeline: {
   SimpleEntry(
-    date: .now, configuration: .smiley,
+    date: .now,
     image: UIImage(
       data: try! Data(
         contentsOf: URL(
