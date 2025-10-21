@@ -24,30 +24,33 @@ struct Provider: AppIntentTimelineProvider {
 
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry
   {
-    let areaMax = 988_574.0
-    let sizeMax = Int(sqrt(areaMax))
     let modelContext = ModelContext(modelContainer)
     guard let items = try? modelContext.fetch(FetchDescriptor<Item>()) else {
       return .init(date: Date(), image: nil)
     }
-    guard let item = items.randomElement() else {
-      return .init(date: Date(), image: nil)
+    var sumOfImages = 0
+    var itemImages: [Item: Int] = [:]
+    for item in items {
+      let count = (await AlbumManager.shared.count(item: item)) ?? 0
+      itemImages[item] = count
+      sumOfImages += count
     }
-    guard var imageUrl = try? await AlbumManager.shared.image(item: item) else {
-      return .init(date: Date(), image: nil)
+    let randomIndex = Int.random(in: 0..<sumOfImages)
+    var target: Item? = nil
+    var cumulative = 0
+    for (item, count) in itemImages {
+      cumulative += count
+      if randomIndex < cumulative + count {
+        target = item
+        break
+      }
     }
-    imageUrl.append(queryItems: [.init(name: "viewBox", value: "\(sizeMax),\(sizeMax)")])
-    guard let (data, _) = try? await URLSession.shared.data(from: imageUrl) else {
-      return .init(date: Date(), image: nil)
-    }
-    guard let image = UIImage(data: data) else {
+    guard let target else {
       return .init(date: Date(), image: nil)
     }
 
-    return SimpleEntry(
-      date: Date(),
-      image: image
-    )
+    let image = await AlbumManager.shared.random(item: target)
+    return SimpleEntry(date: Date(), image: image)
   }
 
   func timeline(

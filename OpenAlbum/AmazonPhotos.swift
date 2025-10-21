@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UIKit
 
 struct AmazonPhotos: AlbumProvider {
   let id: String  // Share ID
@@ -13,6 +14,7 @@ struct AmazonPhotos: AlbumProvider {
     "https://www.amazon\(tld.rawValue)/photos/share/\(id)"
   }
 
+  private static var countCache: [String: Int] = [:]  // shareId -> count
   private static var metaCache: [String: AlbumMeta] = [:]  // shareId -> AlbumMeta
   private static var mediaParentCache: [String: String] = [:]  // shareId -> parentId
   private static var imageUrlCache: [String: String] = [:]  // itemId -> imageUrl
@@ -34,44 +36,47 @@ struct AmazonPhotos: AlbumProvider {
     return AmazonPhotos(id: shareId, tld: tld)
   }
 
-  func items() async throws -> [ItemID] {
-    guard let mediaParentId = try await resolveMediaParent() else { return [] }
-
-    var allIds: [ItemID] = []
-    let pageSize = 100
-    var offset = 0
-    var total = Int.max
-
-    while offset < total {
-      let response = try await fetchChildren(
-        nodeId: mediaParentId,
-        limit: pageSize,
-        offset: offset,
-        filters: Self.filters,
-        tempLink: true,
-        searchOnFamily: true,
-        lowResThumbnail: true)
-      total = response.count
-      for (index, item) in zip(response.data.indices, response.data) {
-        let idx = offset + index
-        allIds.append(.int(idx))
-        if let tempLink = item.tempLink {
-          AmazonPhotos.cacheQueue.async(flags: .barrier) {
-            Self.imageUrlCache["\(id)[\(idx)]"] = tempLink
-          }
-        }
-      }
-      if response.data.isEmpty { break }  // safety
-      offset += response.data.count
+  func count() async throws -> Int {
+    if let cached = AmazonPhotos.countCache[id] {
+      return cached
     }
-    return allIds
+
+    guard let mediaParentId = try await resolveMediaParent() else { return 0 }
+
+    let response = try await fetchChildren(
+      nodeId: mediaParentId,
+      limit: 1,  // 0 is not allowed
+      offset: 0,
+      filters: Self.filters,
+      searchOnFamily: true,
+      lowResThumbnail: true)
+    AmazonPhotos.cacheQueue.async(flags: .barrier) {
+      AmazonPhotos.countCache[id] = response.count
+    }
+    return response.count
   }
 
-  func image(id: ItemID) async throws -> URL? {
-    guard case .int(let idx) = id else { return nil }
-    if let cached = AmazonPhotos.cacheQueue.sync(execute: { Self.imageUrlCache["\(id)[\(idx)]"] }) {
-      return URL(string: cached)
+  func random() async throws -> UIImage? {
+    let url = try await randomUrl()
+    guard let url else { return nil }
+    let (data, response) = try await URLSession.shared.data(from: url)
+    guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+      throw AmazonPhotosError.badStatus(code: (response as? HTTPURLResponse)?.statusCode ?? -1)
     }
+    return UIImage(data: data)
+  }
+
+  private func randomUrl() async throws -> URL? {
+    let count = try await self.count()
+    guard count > 0 else { return nil }
+    let idx = Int.random(in: 0..<count)
+
+    if let cachedUrlString = AmazonPhotos.imageUrlCache["\(id)[\(idx)]"],
+      let cachedUrl = URL(string: cachedUrlString)
+    {
+      return cachedUrl
+    }
+
     guard let mediaParentId = try await resolveMediaParent() else { return nil }
     let response = try await fetchChildren(
       nodeId: mediaParentId,
@@ -81,8 +86,9 @@ struct AmazonPhotos: AlbumProvider {
       tempLink: true,
       searchOnFamily: true,
       lowResThumbnail: true)
-    guard let url = response.data.first?.tempLink else { return nil }
-    guard var url = URL(string: url) else { return nil }
+    guard let urlString = response.data.first?.tempLink,
+      var url = URL(string: urlString)
+    else { return nil }
     let areaMax = 988_574.0
     let sizeMax = Int(sqrt(areaMax))
     url.append(queryItems: [.init(name: "viewBox", value: "\(sizeMax),\(sizeMax)")])

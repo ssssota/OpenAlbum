@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UIKit
 
 struct JustImage: AlbumProvider {
   let url: URL
@@ -18,11 +19,17 @@ struct JustImage: AlbumProvider {
     return nil
   }
 
-  func items() async throws -> [ItemID] {
-    return [.none]
+  func count() async throws -> Int {
+    return 1
   }
 
-  func image(id: ItemID) async throws -> URL? {
-    return url
+  func random() async throws -> UIImage? {
+    let (data, response) = try await URLSession.shared.data(from: url)
+    guard let httpResponse = response as? HTTPURLResponse,
+      (200...299).contains(httpResponse.statusCode)
+    else {
+      return nil
+    }
+    return UIImage(data: data)
   }
 }
