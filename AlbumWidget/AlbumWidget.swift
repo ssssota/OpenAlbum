@@ -30,20 +30,16 @@ struct Provider: AppIntentTimelineProvider {
     guard let items = try? modelContext.fetch(FetchDescriptor<Item>()) else {
       return .init(date: Date(), image: nil)
     }
-    print("items: \(items)")
     guard let item = items.randomElement() else {
       return .init(date: Date(), image: nil)
     }
-    print("item: \(item)")
     guard var imageUrl = try? await AlbumManager.shared.image(item: item) else {
       return .init(date: Date(), image: nil)
     }
     imageUrl.append(queryItems: [.init(name: "viewBox", value: "\(sizeMax),\(sizeMax)")])
-    print("imageUrl with query: \(imageUrl)")
     guard let (data, _) = try? await URLSession.shared.data(from: imageUrl) else {
       return .init(date: Date(), image: nil)
     }
-    print("imageData")
     guard let image = UIImage(data: data) else {
       return .init(date: Date(), image: nil)
     }
@@ -54,12 +50,17 @@ struct Provider: AppIntentTimelineProvider {
     )
   }
 
-  func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<
-    SimpleEntry
-  > {
+  func timeline(
+    for configuration: ConfigurationAppIntent,
+    in context: Context
+  ) async -> Timeline<SimpleEntry> {
+    let entry = await snapshot(for: configuration, in: context)
+    // if image is nil, update quickly
+    let timeInterval =
+      entry.image == nil ? 60 : TimeInterval(configuration.updateIntervalMinutes.rawValue * 60)
     return Timeline(
-      entries: [await snapshot(for: configuration, in: context)],
-      policy: .after(Date().addingTimeInterval(60 * 60)))
+      entries: [entry],
+      policy: .after(Date().addingTimeInterval(timeInterval)))
   }
 
   //    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
