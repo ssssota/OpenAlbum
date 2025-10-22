@@ -1,9 +1,5 @@
-//
-//  AppIntent.swift
-//  AlbumWidget
-//
-//  Created by Tomikawa Sotaro on 2025/10/09.
-//
+// Copyright (C) 2025 TOMIKAWA Sotaro
+// https://github.com/ssssota/OpenAlbum
 
 import AppIntents
 import WidgetKit

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 TOMIKAWA Sotaro
+// https://github.com/ssssota/OpenAlbum
+
 import Foundation
 import SwiftData
 import UIKit
