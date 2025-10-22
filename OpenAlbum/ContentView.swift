@@ -14,28 +14,21 @@ struct ContentView: View {
   @Query private var items: [Item]
   @State private var showModal = false
 
-  var itemURLs: [URL] {
-    return Array(Set(items.map { $0.url }))
-  }
-
   var body: some View {
     NavigationStack {
       List {
-        ForEach(itemURLs, id: \.self) { url in
+        ForEach(items, id: \.self) { item in
+
           // NavigationLink {
           //   AlbumView(url: url)
           // } label: {
-          Text(url.absoluteString)
+          Text("\(item.url.absoluteString) \(item.count != nil ? "(\(item.count!))" : "")")
           // }
         }
         .onDelete(perform: { indexSet in
           withAnimation {
-            for index in indexSet {
-              let url = itemURLs[index]
-              let predicate = #Predicate<Item> { item in
-                item.url == url
-              }
-              try? modelContext.delete(model: Item.self, where: predicate)
+            indexSet.map { items[$0] }.forEach { item in
+              modelContext.delete(item)
             }
           }
           syncModel()

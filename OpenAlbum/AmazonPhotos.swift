@@ -145,7 +145,7 @@ struct AmazonPhotos: AlbumProvider {
     guard let url = components.url else { throw AmazonPhotosError.invalidURL }
     let (data, response) = try await URLSession.shared.data(from: url)
     guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-      print("Response: \(response)")
+      // print("Response: \(response)")
       throw AmazonPhotosError.badStatus(code: (response as? HTTPURLResponse)?.statusCode ?? -1)
     }
     let decoder = JSONDecoder()
@@ -153,7 +153,7 @@ struct AmazonPhotos: AlbumProvider {
     do {
       share = try decoder.decode(ShareMetadata.self, from: data)
     } catch {
-      print("Decoding error: \(error)")
+      // print("Decoding error: \(error)")
       throw AmazonPhotosError.decoding(error)
     }
     return (name: share.nodeInfo.name, collectionId: share.nodeInfo.id)
@@ -208,18 +208,18 @@ struct AmazonPhotos: AlbumProvider {
     if lowResThumbnail { query.append(URLQueryItem(name: "lowResThumbnail", value: "true")) }
     components.queryItems = query
     let url = components.url!
-    print("Fetching children: \(url)")
+    // print("Fetching children: \(url)")
     let (data, response) = try await URLSession.shared.data(from: url)
-    print("Fetched \(data.count) bytes")
+    // print("Fetched \(data.count) bytes")
     guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-      print("Response: \(response)")
+      // print("Response: \(response)")
       throw AmazonPhotosError.badStatus(code: (response as? HTTPURLResponse)?.statusCode ?? -1)
     }
     let decoder = JSONDecoder()
     do {
       return try decoder.decode(ChildrenResponse.self, from: data)
     } catch {
-      print("Decoding error: \(error)")
+      // print("Decoding error: \(error)")
       throw AmazonPhotosError.decoding(error)
     }
   }

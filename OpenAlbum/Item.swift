@@ -10,72 +10,18 @@ import SwiftData
 import UIKit
 
 enum ItemMigrationPlan: SchemaMigrationPlan {
-  static var schemas: [any VersionedSchema.Type] = [
-    ItemSchemaV001.self,
-    ItemSchemaV002.self,
-  ]
-  static var stages: [MigrationStage] = [
-    stageV1ToV2
-  ]
-
-  static let stageV1ToV2 = MigrationStage.custom(
-    fromVersion: ItemSchemaV001.self, toVersion: ItemSchemaV002.self, willMigrate: nil
-  ) { context in
-    let descriptor = FetchDescriptor<ItemSchemaV001.Item>(predicate: nil)
-    let items = try context.fetch(descriptor)
-    for oldItem in items {
-      let newItem = ItemSchemaV002.Item(url: oldItem.url, count: nil)
-      context.insert(newItem)
-      context.delete(oldItem)
-    }
-    try? context.save()
-  }
+  static var schemas: [any VersionedSchema.Type] = [ItemSchemaV001.self]
+  static var stages: [MigrationStage] = []
 }
 
-typealias Item = ItemSchemaV002.Item
-
+typealias Item = ItemSchemaV001.Item
 struct ItemSchemaV001: VersionedSchema {
   static var models: [any PersistentModel.Type] = [Item.self]
-
-  static var versionIdentifier: Schema.Version = .init(0, 0, 1)
+  static var versionIdentifier: Schema.Version = .init(0, 1, 3)
 
   @Model
   final class Item: Sendable {
     @Attribute(.unique)
-    var url: URL
-    var id: ItemID
-
-    init(url: URL, id: ItemID) {
-      self.url = url
-      self.id = id
-    }
-  }
-
-  enum ItemID: Codable, Hashable {
-    case int(Int)
-    case string(String)
-    case none
-
-    func toString() -> String {
-      switch self {
-      case .int(let value):
-        return String(value)
-      case .string(let value):
-        return value
-      case .none:
-        return "none"
-      }
-    }
-  }
-
-}
-
-struct ItemSchemaV002: VersionedSchema {
-  static var models: [any PersistentModel.Type] = [Item.self]
-  static var versionIdentifier: Schema.Version = .init(0, 1, 0)
-
-  @Model
-  final class Item: Sendable {
     var url: URL
     var count: Int?
 
