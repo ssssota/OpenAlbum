@@ -15,14 +15,14 @@ struct Provider: AppIntentTimelineProvider {
   }
 
   func placeholder(in context: Context) -> SimpleEntry {
-    .init(date: Date(), image: nil)
+    .init(date: Date(), target: nil)
   }
 
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry
   {
     let modelContext = ModelContext(modelContainer)
     guard let items = try? modelContext.fetch(FetchDescriptor<Item>()) else {
-      return .init(date: Date(), image: nil)
+      return .init(date: Date(), target: nil)
     }
     var sumOfImages = 0
     var itemImages: [Item: Int] = [:]
@@ -42,11 +42,19 @@ struct Provider: AppIntentTimelineProvider {
       }
     }
     guard let target else {
-      return .init(date: Date(), image: nil)
+      return .init(date: Date(), target: nil)
     }
 
     let image = await AlbumManager.shared.random(item: target)
-    return SimpleEntry(date: Date(), image: image)
+    guard let image else {
+      return .init(date: Date(), target: nil)
+    }
+    return SimpleEntry(
+      date: Date(),
+      target: Target(
+        image: image.image,
+        album: target.url,
+        id: image.id))
   }
 
   func timeline(
@@ -56,7 +64,7 @@ struct Provider: AppIntentTimelineProvider {
     let entry = await snapshot(for: configuration, in: context)
     // if image is nil, update quickly
     let timeInterval =
-      entry.image == nil ? 60 : TimeInterval(configuration.updateIntervalMinutes.rawValue * 60)
+      entry.target == nil ? 60 : TimeInterval(configuration.updateIntervalMinutes.rawValue * 60)
     return Timeline(
       entries: [entry],
       policy: .after(Date().addingTimeInterval(timeInterval)))
@@ -70,22 +78,41 @@ struct Provider: AppIntentTimelineProvider {
 struct SimpleEntry: TimelineEntry {
   let date: Date
 
-  let image: UIImage?
+  let target: Target?
+}
+struct Target {
+  let image: UIImage
+  let album: URL
+  let id: LosslessStringConvertible
 }
 
 struct AlbumWidgetEntryView: View {
   var entry: Provider.Entry
 
-  var body: some View {
-    if let uiImage = entry.image {
-      Image(uiImage: uiImage)
-        .resizable()
-        .scaledToFill()
-        .clipped()
-    } else {
+  var widgetURL: URL? {
+    guard let target = entry.target else { return nil }
+    var components = URLComponents()
+    components.scheme = "openalbum"
+    components.host = "image"
+    components.queryItems = [
+      URLQueryItem(name: "url", value: target.album.absoluteString),
+      URLQueryItem(name: "id", value: String(describing: target.id)),
+    ]
+    return components.url
+  }
 
-      Image("placeholder")
+  var body: some View {
+    Group {
+      if let uiImage = entry.target?.image {
+        Image(uiImage: uiImage)
+          .resizable()
+          .scaledToFill()
+          .clipped()
+      } else {
+        Image("placeholder")
+      }
     }
+    .widgetURL(widgetURL)
   }
 }
 
@@ -115,10 +142,13 @@ struct AlbumWidget: Widget {
 } timeline: {
   SimpleEntry(
     date: .now,
-    image: UIImage(
-      data: try! Data(
-        contentsOf: URL(
-          string:
-            "https://fastly.picsum.photos/id/572/500/500.jpg?hmac=fg8DuZ9XdkpT4xivkrIW8N2hhvZK9YeWuKkPOeK0YUw"
-        )!)))
+    target: Target(
+      image: UIImage(
+        data: try! Data(
+          contentsOf: URL(
+            string:
+              "https://fastly.picsum.photos/id/572/500/500.jpg?hmac=fg8DuZ9XdkpT4xivkrIW8N2hhvZK9YeWuKkPOeK0YUw"
+          )!))!,
+      album: URL(string: "album://example")!,
+      id: 0))
 }

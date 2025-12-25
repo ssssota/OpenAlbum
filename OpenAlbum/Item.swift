@@ -68,23 +68,31 @@ class AlbumManager {
     return count
   }
 
-  func random(item: Item) async -> UIImage? {
-    guard
-      let provider = resolveProvider(url: item.url),
-      let image = try? await provider.random()
-    else { return nil }
-    return image
+  func random(item: Item) async -> AlbumImage? {
+    guard let provider = resolveProvider(url: item.url) else { return nil }
+    return try? await provider.randomImage()
+  }
+
+  func resolveImage(url: URL, id: String) async -> URL? {
+    guard let provider = resolveProvider(url: url) else { return nil }
+    return try? await provider.image(id: id)
   }
 }
 
 protocol AlbumProvider {
   static func resolve(url: URL) -> AlbumProvider?
   func count() async throws -> Int
-  func random() async throws -> UIImage?
+  func randomImage() async throws -> AlbumImage?
+  func image(id: String) async throws -> URL?
 }
 
 struct AlbumMeta {
   let id: String
   let name: String
   let count: Int
+}
+
+struct AlbumImage {
+  let image: UIImage
+  let id: any LosslessStringConvertible
 }

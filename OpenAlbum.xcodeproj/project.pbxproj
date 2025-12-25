@@ -61,6 +61,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		921B89152EFD86DF00D026EB /* Exceptions for "OpenAlbum" folder in "OpenAlbum" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9248DD852E97CEAB00814079 /* OpenAlbum */;
+		};
 		9248DDCC2E97D05E00814079 /* Exceptions for "AlbumWidget" folder in "AlbumWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -83,6 +90,7 @@
 		9248DD882E97CEAB00814079 /* OpenAlbum */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				921B89152EFD86DF00D026EB /* Exceptions for "OpenAlbum" folder in "OpenAlbum" target */,
 				928EED1D2E9A076B00EA2C55 /* Exceptions for "OpenAlbum" folder in "AlbumWidgetExtension" target */,
 			);
 			path = OpenAlbum;
@@ -533,6 +541,7 @@
 				DEVELOPMENT_TEAM = R66925M2U8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenAlbum/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -564,6 +573,7 @@
 				DEVELOPMENT_TEAM = R66925M2U8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenAlbum/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
