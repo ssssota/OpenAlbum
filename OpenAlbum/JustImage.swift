@@ -37,7 +37,7 @@ struct JustImage: AlbumProvider {
     return AlbumImage(image: image, id: 0)
   }
 
-  func image(id: String) -> URL? {
+  func image(id: String) async throws -> URL? {
     return url
   }
 }
