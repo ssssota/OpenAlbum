@@ -26,13 +26,18 @@ struct JustImage: AlbumProvider {
     return 1
   }
 
-  func random() async throws -> UIImage? {
+  func randomImage() async throws -> AlbumImage? {
     let (data, response) = try await URLSession.shared.data(from: url)
     guard let httpResponse = response as? HTTPURLResponse,
       (200...299).contains(httpResponse.statusCode)
     else {
       return nil
     }
-    return UIImage(data: data)
+    guard let image = UIImage(data: data) else { return nil }
+    return AlbumImage(image: image, id: 0)
+  }
+
+  func image(id: String) -> URL? {
+    return url
   }
 }

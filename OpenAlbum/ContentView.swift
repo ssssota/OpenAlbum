@@ -9,6 +9,7 @@ struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var items: [Item]
   @State private var showModal = false
+  @State private var tappedImage: TappedImage?
 
   var body: some View {
     NavigationStack {
@@ -60,6 +61,25 @@ struct ContentView: View {
           }
         }
       )
+    }
+    .sheet(item: $tappedImage) { image in
+      ImageViewer(url: image.url)
+    }
+    .onOpenURL { url in
+      let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+      guard components?.scheme == "openalbum",
+        components?.host == "image",
+        let queryItems = components?.queryItems,
+        let urlString = queryItems.first(where: { $0.name == "url" })?.value,
+        let url = URL(string: urlString),
+        let id = queryItems.first(where: { $0.name == "id" })?.value
+      else {
+        return
+      }
+      Task {
+        guard let resolvedUrl = await AlbumManager.shared.resolveImage(url: url, id: id) else { return }
+        tappedImage = TappedImage(url: resolvedUrl)
+      }
     }
   }
 
@@ -114,6 +134,52 @@ struct SheetView: View {
           }
           .bold()
           .disabled(!available)
+        }
+      }
+    }
+  }
+}
+
+struct TappedImage: Identifiable {
+  let url: URL
+  var id: String { url.absoluteString }
+}
+
+struct ImageViewer: View {
+  let url: URL
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      ZStack {
+        Color.black.ignoresSafeArea()
+        AsyncImage(url: url) { phase in
+          switch phase {
+          case .empty:
+            ProgressView()
+              .tint(.white)
+          case .success(let image):
+            image
+              .resizable()
+              .scaledToFit()
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+          case .failure:
+            VStack(spacing: 12) {
+              Text("Failed to load image")
+                .foregroundColor(.white)
+              Link("Open in browser", destination: url)
+            }
+            .padding()
+          @unknown default:
+            EmptyView()
+          }
+        }
+      }
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Close") {
+            dismiss()
+          }
         }
       }
     }

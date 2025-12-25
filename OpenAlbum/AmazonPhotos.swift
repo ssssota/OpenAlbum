@@ -59,21 +59,37 @@ struct AmazonPhotos: AlbumProvider {
     return response.count
   }
 
-  func random() async throws -> UIImage? {
-    let url = try await randomUrl()
-    guard let url else { return nil }
+  func randomImage() async throws -> AlbumImage? {
+    let rand = try await randomUrl()
+    guard let rand else { return nil }
+    let (url, idx) = rand
+    return try await buildAlbumImage(url: url, idx: idx)
+  }
+
+  func image(id: String) async throws -> URL? {
+    guard let idx = Int(id) else { return nil }
+    return try await loadFromIdx(id: self.id, idx: idx)
+  }
+
+  private func buildAlbumImage(url: URL, idx: Int) async throws -> AlbumImage? {
     let (data, response) = try await URLSession.shared.data(from: url)
     guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
       throw AmazonPhotosError.badStatus(code: (response as? HTTPURLResponse)?.statusCode ?? -1)
     }
-    return UIImage(data: data)
+    guard let image = UIImage(data: data) else { return nil }
+    return AlbumImage(image: image, id: idx)
   }
 
-  private func randomUrl() async throws -> URL? {
+  private func randomUrl() async throws -> (URL, Int)? {
     let count = try await self.count()
     guard count > 0 else { return nil }
     let idx = Int.random(in: 0..<count)
 
+    guard let url = try await loadFromIdx(id: id, idx: idx) else { return nil }
+    return (url, idx)
+  }
+
+  private func loadFromIdx(id: String, idx: Int) async throws -> URL? {
     if let cachedUrlString = AmazonPhotos.imageUrlCache["\(id)[\(idx)]"],
       let cachedUrl = URL(string: cachedUrlString)
     {
