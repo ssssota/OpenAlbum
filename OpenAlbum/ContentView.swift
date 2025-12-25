@@ -15,12 +15,11 @@ struct ContentView: View {
     NavigationStack {
       List {
         ForEach(items, id: \.self) { item in
-
-          // NavigationLink {
-          //   AlbumView(url: url)
-          // } label: {
-          Text("\(item.url.absoluteString) \(item.count != nil ? "(\(item.count!))" : "")")
-          // }
+          Link(
+            destination: item.url,
+            label: {
+              Text("\(item.url.absoluteString) \(item.count != nil ? "(\(item.count!))" : "")")
+            })
         }
         .onDelete(perform: { indexSet in
           withAnimation {
@@ -77,7 +76,9 @@ struct ContentView: View {
         return
       }
       Task {
-        guard let resolvedUrl = await AlbumManager.shared.resolveImage(url: url, id: id) else { return }
+        guard let resolvedUrl = await AlbumManager.shared.resolveImage(url: url, id: id) else {
+          return
+        }
         tappedImage = TappedImage(url: resolvedUrl)
       }
     }
